@@ -1,0 +1,21 @@
+# Impede baixar/abrir pelo navegador arquivos que só o PHP deve ler
+<FilesMatch "^(config|crypto|email|whatsapp)\.php$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# SQL e documentação não devem ficar públicos
+<FilesMatch "\.(sql|md)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>

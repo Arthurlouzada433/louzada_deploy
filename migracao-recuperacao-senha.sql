@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS recuperacoes_senha (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT NOT NULL,
+  codigo_hash CHAR(64) NOT NULL,
+  token_hash CHAR(64) NULL,
+  tentativas INT NOT NULL DEFAULT 0,
+  expira_em DATETIME NOT NULL,
+  criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

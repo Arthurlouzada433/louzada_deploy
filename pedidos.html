@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedidos — Louzada Frutas & Legumes (Admin)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FBF7EC;
+    --cream-2:#F3EEDF;
+    --forest:#1E4429;
+    --forest-2:#12301C;
+    --orange:#EE7B10;
+    --orange-2:#D96A05;
+    --lime:#8DC63F;
+    --ink:#22271D;
+    --ink-soft:#5B6156;
+    --card:#FFFFFF;
+    --line: rgba(30,68,41,0.14);
+    --radius: 18px;
+    --danger:#C0392B;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  h1,h2,h3{font-family:'Fraunces', serif; color:var(--forest-2); font-weight:600;}
+  a{color:inherit;}
+  .wrap{max-width:980px; margin:0 auto; padding:40px 24px 80px;}
+
+  /* ---------- GATE (tela de senha) ---------- */
+  .gate-screen{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .gate-box{
+    background:var(--card); border-radius:24px; padding:40px 34px; width:100%; max-width:380px;
+    box-shadow:0 24px 60px -20px rgba(20,40,20,.25); text-align:center;
+  }
+  .gate-box .lock{
+    width:56px; height:56px; border-radius:50%; background:var(--cream-2); color:var(--forest);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 18px; font-size:24px;
+  }
+  .gate-box h2{font-size:22px; margin-bottom:8px;}
+  .gate-box p{color:var(--ink-soft); font-size:14px; margin-bottom:24px; line-height:1.5;}
+  .field{text-align:left; margin-bottom:16px;}
+  .field label{display:block; font-size:13px; font-weight:700; color:var(--forest-2); margin-bottom:6px;}
+  .field input{
+    width:100%; padding:13px 14px; border-radius:12px; border:1.5px solid var(--line);
+    background:var(--cream); font-family:inherit; font-size:15px; color:var(--ink);
+  }
+  .field input:focus{outline:none; border-color:var(--orange);}
+  .pw-wrap{position:relative;}
+  .pw-wrap input{padding-right:44px;}
+  .pw-toggle{
+    position:absolute; top:50%; right:6px; transform:translateY(-50%);
+    width:32px; height:32px; border:none; background:transparent; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:17px;
+    color:var(--ink-soft); border-radius:8px; padding:0; line-height:1;
+  }
+  .pw-toggle:hover{color:var(--orange-2); background:var(--cream-2);}
+  .pw-toggle.active{color:var(--orange);}
+  .gate-msg{font-size:13px; font-weight:600; color:var(--danger); min-height:18px; margin-bottom:10px;}
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;
+    padding:14px; border-radius:999px; font-weight:700; font-size:15px; cursor:pointer; border:none;
+    background:var(--orange); color:#fff; transition:.18s;
+  }
+  .btn:hover{background:var(--orange-2);}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  .back-link{display:inline-block; margin-top:20px; font-size:13px; color:var(--ink-soft); font-weight:600;}
+  .back-link:hover{color:var(--orange-2);}
+</style>
+</head>
+<body>
+
+<!-- ---------- TELA DE SENHA ---------- -->
+<div class="gate-screen" id="gateScreen">
+  <div class="gate-box">
+    <div class="lock">🔒</div>
+    <h2>Área do administrador</h2>
+    <p>Informe a senha mestra para ver os pedidos recebidos pela loja.</p>
+    <form id="gateForm" novalidate>
+      <div class="field">
+        <label for="gateUser">Usuário</label>
+        <input type="text" id="gateUser" placeholder="Usuário administrador" autocomplete="off" required>
+      </div>
+      <div class="field">
+        <label for="gatePassword">Senha mestra</label>
+        <div class="pw-wrap">
+          <input type="password" id="gatePassword" placeholder="Senha mestra do administrador" autocomplete="off" required>
+          <button type="button" class="pw-toggle" id="pwToggle" aria-label="Mostrar senha" aria-pressed="false">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="gate-msg" id="gateMsg"></div>
+      <button type="submit" class="btn" id="gateSubmit">Entrar</button>
+    </form>
+    <a class="back-link" href="index.html">← Voltar para a loja</a>
+  </div>
+</div>
+
+<script>
+  const API_BASE = 'api'; // pasta onde estão auth.php, produtos.php etc. Ajuste se a API estiver em outro caminho.
+  const SESSION_KEY = 'louzada_admin_orders_session';
+  const REPORT_PAGE = 'relatorio.html';
+
+  const gateForm = document.getElementById('gateForm');
+  const gateMsg = document.getElementById('gateMsg');
+  const pwToggle = document.getElementById('pwToggle');
+  const gatePassword = document.getElementById('gatePassword');
+
+  const EYE_OPEN_SVG = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const EYE_CLOSED_SVG = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.2A10.6 10.6 0 0 1 12 5c7 0 11 7 11 7a17.9 17.9 0 0 1-3.3 4.2M6.6 6.6C3.7 8.4 1 12 1 12s4 7 11 7c1.6 0 3-.3 4.3-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+
+  pwToggle.addEventListener('click', () => {
+    const showing = gatePassword.type === 'text';
+    gatePassword.type = showing ? 'password' : 'text';
+    pwToggle.classList.toggle('active', !showing);
+    pwToggle.innerHTML = showing ? EYE_OPEN_SVG : EYE_CLOSED_SVG;
+    pwToggle.setAttribute('aria-pressed', String(!showing));
+    pwToggle.setAttribute('aria-label', showing ? 'Mostrar senha' : 'Ocultar senha');
+  });
+
+  // Sessão real: pergunta pro servidor (cookie de sessão) se o admin já está logado.
+  (async () => {
+    try{
+      const r = await fetch(`${API_BASE}/auth.php?acao=status`, { credentials: 'include' });
+      const j = await r.json();
+      if(j.logado && j.tipo === 'admin'){
+        window.location.href = REPORT_PAGE;
+      }
+    }catch(e){ /* sem conexão com a API ainda — deixa o usuário tentar o login normalmente */ }
+  })();
+
+  gateForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const usuario = document.getElementById('gateUser').value.trim();
+    const senha = document.getElementById('gatePassword').value;
+    const submitBtn = document.getElementById('gateSubmit');
+
+    gateMsg.textContent = '';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Entrando…';
+
+    try{
+      const r = await fetch(`${API_BASE}/auth.php?acao=login`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario, senha }),
+      });
+      const j = await r.json();
+
+      if(r.ok && j.ok){
+        if(j.tipo !== 'admin'){
+          gateMsg.textContent = 'Esse usuário não tem acesso de administrador.';
+          document.getElementById('gatePassword').value = '';
+          return;
+        }
+        window.location.href = REPORT_PAGE;
+        return;
+      }
+
+      // 423 = conta bloqueada por tentativas erradas; qualquer outro erro cai no texto vindo da API
+      gateMsg.textContent = j.erro || 'Usuário ou senha incorretos.';
+      document.getElementById('gatePassword').value = '';
+    }catch(err){
+      gateMsg.textContent = 'Não foi possível conectar ao servidor. Tente novamente.';
+    }finally{
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Entrar';
+    }
+  });
+</script>
+<script>document.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('keydown',e=>{if(e.key==='F12'||(e.ctrlKey&&e.key.toLowerCase()==='u')||(e.ctrlKey&&e.shiftKey&&['I','J','C'].includes(e.key.toUpperCase())))e.preventDefault();});</script>
+</body>
+</html>
